@@ -179,6 +179,32 @@ class KeyringController extends EventEmitter {
   }
 
   /**
+   * Check Password
+   *
+   * Attempts to decrypt the current vault and verify the password
+   * used to unlock is correct. This is only used for 2FA verification
+   * on login.
+   *
+   *
+   * @emits KeyringController#unlock
+   * @param {string} password - The keyring controller password.
+   * @returns {Promise<boolean>} A Promise that resolves to a boolean of if the password is correct or not.
+   */
+  async checkPassword(password) {
+      const encryptedVault = this.store.getState().vault;
+      if (!encryptedVault) {
+        throw new Error('Cannot unlock without a previous vault.');
+      }
+  
+      await this.clearKeyrings();
+      const vault = await this.encryptor.decrypt(password, encryptedVault);
+      const isValid = vault === null;
+      await this.clearKeyrings();
+
+      return isValid;
+  }
+
+  /**
    * Verify Password
    *
    * Attempts to decrypt the current vault with a given password
