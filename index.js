@@ -198,7 +198,7 @@ class KeyringController extends EventEmitter {
   
       await this.clearKeyrings();
       const vault = await this.encryptor.decrypt(password, encryptedVault);
-      const isValid = vault === null;
+      const isValid = vault !== null;
       await this.clearKeyrings();
 
       return isValid;
